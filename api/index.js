@@ -1,20 +1,22 @@
+// api/index.js
 import dotenv from "dotenv";
-dotenv.config({ path: "../.env" });
+dotenv.config({ path: './.env' });
 
-import express from "express";
-import connectDB from "../config/db.js";
-import authRoutes from "../routes/auth.js";
-import cors from "cors";
-import serverless from "@vendia/serverless-express";
+import express from 'express';
+import connectDB from '../config/db.js'; // adjust path
+import authRoutes from '../routes/auth.js'; // adjust path
+import cors from 'cors';
+import serverless from '@vendia/serverless-express';
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/auth", authRoutes);
+app.use('/api/auth', authRoutes);
 
-app.get("/", (req, res) => {
-  res.send("Server is running from Vercel!");
+app.get('/', (req, res) => {
+  res.send("server is running");
 });
 
 app.use((err, req, res, next) => {
@@ -22,15 +24,7 @@ app.use((err, req, res, next) => {
   res.status(500).send({ message: err.message || "Something went wrong!" });
 });
 
-// Connect to DB only once and cache the handler
-let serverlessHandler;
+// connect to DB before exporting handler
+await connectDB();
 
-const handler = async (req, res) => {
-  if (!serverlessHandler) {
-    await connectDB(); // one-time DB connection
-    serverlessHandler = serverless(app);
-  }
-  return serverlessHandler(req, res);
-};
-
-export default handler;
+export const handler = serverless({ app });
