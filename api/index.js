@@ -1,30 +1,33 @@
-// api/index.js
-import dotenv from "dotenv";
-dotenv.config({ path: './.env' });
-
 import express from 'express';
-import connectDB from '../config/db.js'; // adjust path
-import authRoutes from '../routes/auth.js'; // adjust path
 import cors from 'cors';
-import serverless from '@vendia/serverless-express';
+import dotenv from 'dotenv';
+import connectDB from '../config/db.js';
+import authRoutes from '../routes/auth.js';
+import serverless from 'serverless-http';
+
+dotenv.config();
 
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 
+// Connect DB
+connectDB();
+
+// Routes
 app.use('/api/auth', authRoutes);
 
 app.get('/', (req, res) => {
-  res.send("server is running");
+  res.send('Server is running 🎉');
 });
 
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send({ message: err.message || "Something went wrong!" });
-});
+// ✅ If running locally: use app.listen
+if (process.env.NODE_ENV !== 'production') {
+  const port = process.env.PORT || 8080;
+  app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+  });
+}
 
-// connect to DB before exporting handler
-await connectDB();
-
-export const handler = serverless({ app });
+// ✅ If running on Vercel: export handler
+export const handler = serverless(app);
