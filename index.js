@@ -3,8 +3,8 @@ import dotenv from "dotenv";
 dotenv.config({ path: './.env' });
 
 import express from 'express';
-import connectDB from '../config/db.js'; // adjust path
-import authRoutes from '../routes/auth.js'; // adjust path
+import connectDB from './config/db.js'; // adjust path
+import authRoutes from './routes/auth.js'; // adjust path
 import cors from 'cors';
 import serverless from '@vendia/serverless-express';
 
