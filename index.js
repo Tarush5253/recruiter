@@ -13,6 +13,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use(function (req, res, next) {
+
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept"
+    );
+    next();
+  });
+  
+
 app.use('/api/auth', authRoutes);
 
 app.get('/', (req, res) => {
@@ -24,7 +34,14 @@ app.use((err, req, res, next) => {
   res.status(500).send({ message: err.message || "Something went wrong!" });
 });
 
-// connect to DB before exporting handler
-await connectDB();
 
-export const handler = serverless({ app });
+const port = process.env.PORT || 8080;
+connectDB()
+.then(()=>{
+    app.listen(port , ()=>{
+        console.log(`server is listening at port ${port}`);
+    })
+})
+.catch((err)=>{
+    console.log("MONGO db connection failed !!! ", err);
+})
