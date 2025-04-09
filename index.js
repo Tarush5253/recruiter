@@ -6,11 +6,6 @@ import connectDB from './config/db.js';
 import authRoutes from './routes/auth.js';
 import cors from 'cors';
 
-// Connect to DB immediately when module loads
-connectDB().catch((err) => {
-  console.error("MongoDB connection failed:", err);
-});
-
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -26,5 +21,12 @@ app.use((err, req, res, next) => {
   res.status(500).send({ message: err.message || "Something went wrong!" });
 });
 
-// Export Express app as Vercel handler
-export default app;
+connectDB()
+.then(()=>{
+    app.listen(port , ()=>{
+        console.log(`server is listening at port ${port}`);
+    })
+})
+.catch((err)=>{
+    console.log("MONGO db connection failed !!! ", err);
+})
